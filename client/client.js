@@ -4,7 +4,11 @@ var url = require('url');
 var url = require('request');
 var path = require('path');
 var args = {
-    'RecordSequenceID': 12
+     'eMemOrderRelationUpdateNotifyRequest':
+     {
+         'RecordSequenceID': 12,
+         'EUserId' : 1
+     }
 };
 var client_servise;
 soap.createClient('service/wsdl/myservice.wsdl', function(err, client) {
@@ -15,11 +19,11 @@ soap.createClient('service/wsdl/myservice.wsdl', function(err, client) {
 
 
 http.createServer(function(request, response) {
-    client_servise.ESyncNotifySPServiceService.ESyncNotifySP.eMemOrderRelationUpdateNotify({RecordSequenceID: 'value'}, function(err, result, body) {
+    client_servise.ESyncNotifySPServiceService.ESyncNotifySP.eMemOrderRelationUpdateNotify(args, function(err, result) {
         //console.log(result);
-        console.log(err);
+        console.log(result['eMemOrderRelationUpdateNotifyResponse']);
         response.writeHead(200, {"Content-Type": "text/plain"});
-        //response.write((result['eMemOrderRelationUpdateNotifyResponse']));
+        response.write(result['eMemOrderRelationUpdateNotifyResponse']['ResultCode']);
         response.end();
     })
 }).listen(3000);

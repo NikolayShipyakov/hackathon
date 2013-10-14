@@ -12,12 +12,12 @@ var myService = {
             'eMemOrderRelationUpdateNotify': function(args, callback) {
                 args = args["eMemOrderRelationUpdateNotifyRequest"];
                 var oraReqNV = {
-                    'billnum': args.EUserId,
+                    /*'billnum': args.EUserId,
                     'UpdateType': args.UpdateType,
                     'ProductId': args.ProductId,
                     'stime': args.EffectiveDate,
                     'etime': args.ExpireDate,
-                    'mobile': args.UserId.substr( - 11)
+                    'mobile': args.UserId.substr( - 11)*/
                 };
                 callback({
                     'eMemOrderRelationUpdateNotifyResponse': {
