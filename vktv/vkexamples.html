@@ -2,22 +2,29 @@
 <html>
 <head>
     <title></title>
-    <script src="http://userapi.com/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
+    <script src="http://vkontakte.ru/js/api/openapi.js" type="text/javascript" charset="windows-1251"></script>
 </head>
 <body>
 <script language="javascript">
+    var myUID;
+    var myInfo;
     VK.init({
         apiId: 3923208
     });
-    /*function authInfo(response) {
+    function authInfo(response) {
      if (response.session) {
-     alert('user: '+response.session.mid);
+     myUID = response.session.mid;
      } else {
      alert('not auth');
      }
      }
      VK.Auth.getLoginStatus(authInfo);
-     VK.UI.button('login_button');        */
+
+    function getUserInfo(idVk, fields){
+        VK.api("getProfiles", {uids:idVk,fields:fields}, function(data) {
+            myInfo = data;
+        });
+    }
 </script>
 
 <!-- Put this div tag to the place, where Auth block will be -->
@@ -25,6 +32,24 @@
 <script type="text/javascript">
     VK.Widgets.Auth("vk_auth", {width: "200px", authUrl: '/dev/Auth'});
 </script>
+
+<script>
+    var friends;
+    var myInfo;
+    function getFriends(){VK.Api.call("friends.get", {fields:"first_name,photo, last_name, sex, online"}, function(result){
+        friends = result;
+    });}
+
+    function getMyInfo(){
+        VK.Api.call('getVariable', {key: 1281}, function(r) {
+            if(r.response) {
+                myInfo = r;
+            }
+        });
+    }
+</script>
+
+<input type="button" onclick="getFriends()"/>
 
 </body>
 </html>
