@@ -11,22 +11,81 @@ var stage = new Kinetic.Stage({
     height: stageHeight
 });
 
+var isCircleIntercept = function(circles, coords, radius) {
+    return circles.some(function(circle) {
+        return Math.abs(circle.getX() - coords.x) < (circle.getRadius() + radius)
+            && Math.abs(circle.getY() - coords.y) < (circle.getRadius() + radius);
+    });
+};
+
+var getCircleCoordinatesLight = function(circles, radius) {
+    var coords = null,
+        weight = stageWidth - radius * 2,
+        height = stageHeight - radius * 2;
+    tries = 1000;
+    do {
+        if(!tries) return null;
+        coords = {x: weight* Math.random() + radius, y: height * Math.random() + radius};
+    } while(isCircleIntercept(circles, coords, radius));
+    return coords;
+};
+
+var getCircleCoordinatesHeavy = function(circles, radius, step) {
+    var availableCoords = [],
+        y = radius,
+        x = radius;
+    step = step || 1;
+    while(y + radius < stageHeight) {
+        while(x + radius < stageWidth) { 
+            var coords = {x: x, y: y};
+            if(!isCircleIntercept(circles, coords, radius)) {
+                availableCoords.push(coords);
+            }
+            x += step;
+        }
+        x = radius
+        y += step;
+    }
+    var coords = null;
+    if(availableCoords.length > 0) {
+        var index = Math.round(Math.random() * availableCoords.length);
+        coords = availableCoords[index];
+    }
+
+    return coords;
+};
+
+
+var getCircleCoordinates = function(layer, radius) {
+    var circles = layer.getChildren().filter(function(el) {return el instanceof Kinetic.Circle});
+    //var coords = getCircleCoordinatesLight(circles, radius);    
+    var coords = getCircleCoordinatesHeavy(circles, radius, 10)
+    
+    return coords;
+};
+
 var oldLayer = new Kinetic.Layer();
 var drawOldItems = function() {
-    for(var i = 0; i < 8; i++) {
+    for(var i = 0; i < 40; i++) {
+        var coords = getCircleCoordinates(oldLayer, littleRoundRad);
+        if(!coords) {
+            console.log('Sorry, we did not find free space, only %s circles drawn', i)
+            break;
+        }
         var item = new Kinetic.Circle({
-            x: stageWidth * Math.random(),
-            y: stageHeight * Math.random(),
+            x: coords.x,
+            y: coords.y,
             radius: littleRoundRad,
             fillRadialGradientStartRadius: littleRoundRad * 0.9,
             opacity: 0.5,
             fillRadialGradientEndRadius: littleRoundRad,
-            fillRadialGradientColorStops: [0, 'green', 1, 'white'],
+            fillRadialGradientColorStops: [0, 'green', 1, 'transparent'],
         });
         oldLayer.add(item);
     }
 };
 drawOldItems();
+window.oldLayer = oldLayer;
 stage.add(oldLayer);
 
 var layer = new Kinetic.Layer();
@@ -73,4 +132,4 @@ drawFriends();
 //layer.add(rect);
 
 // add the layer to the stage
-stage.add(layer);
+//stage.add(layer);
