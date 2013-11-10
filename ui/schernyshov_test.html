@@ -1,11 +1,11 @@
 <html>
     <head>
         <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.7.3-beta.js"></script>
-        <script src="trigonometrics.js"></script>
     </head>
 	<body>
     <div id="container"></div>
 	  <script>
+        // Инициализация страницы
         var friends = [{"name":"Ivan"}, {"name":"Vlad"}, {"name":"Anton"}, {"name":"Сергей"}, {"name":"Вован"}, {"name":"Петька"}];
 	    var stageWidth = screen.width;
         var stageHeight = screen.height;
@@ -18,39 +18,36 @@
         stage.add(layer);
 
         
+        // Надо вынести в константы, чтоль
         var radiusInc = 50;
-        var lineInc = 10;
 
 
-
-
+        // Рисуем линию с кругом по случайным координатам!
         var myfriend = new Friend(null, choosePosition(), choosePosition(), layer);
-        //myfriend.appear();
+        myfriend.appear();
 
+
+        // Конструктор объекта типа "друг" (вообще-то он должен быть универсальным)
         function Friend(friend, start_point, end_point, layer) {
             // Круг
             var circle = null;
+            var short_line_length = 10;
+
             // Начало линии
+            var short_point = getPointOnLine(start_point, end_point, short_line_length);
             var line = new Kinetic.Line({
-                points: [start_point.x, start_point.y, end_point.x, end_point.y],
+                points: [start_point.x, start_point.y, short_point.x, short_point.y],
                 stroke: 'red',
                 strokeWidth: 15,
                 lineCap: 'round',
                 lineJoin: 'round'
             });
-            var newEnd = evalLineEndCoord(start_point,end_point);
-            var line2 = new Kinetic.Line({
-                points: [start_point.x, start_point.y, newEnd.x, newEnd.y],
-                stroke: 'blue',
-                strokeWidth: 15,
-                lineCap: 'round',
-                lineJoin: 'round'
-            });
-
             layer.add(line);
-            layer.add(line2);
+
             // Анимация 
             this.appear = function() {
+                var line_inc = 10;
+                var currentLength = short_line_length;
                 // Анимация развертки блогов и сообщений           
                 var circleAnimation = new Kinetic.Animation(function(frame) {
                     var radius = circle.getRadius() + 1;
@@ -65,8 +62,11 @@
                 }, layer);
 
                 var lineAnimation = new Kinetic.Animation(function(frame) {
-                    line.getPoints()[1].x = line.getPoints()[1].x + lineInc;
-                    if (line.getPoints()[1].x===120) {
+                    currentLength += line_inc;
+                    var next_point = getPointOnLine(start_point, end_point, currentLength)
+                    line.getPoints()[1].x = next_point.x;
+                    line.getPoints()[1].y = next_point.y;
+                    if (pointsEquals(next_point, end_point)) {
                         lineAnimation.stop();
                         circle = new Kinetic.Circle({
                             x: line.getPoints()[1].x,
@@ -95,6 +95,31 @@
             var seed = 1000;
             return {x:Math.round(Math.random()*seed), y:Math.round(Math.random()*seed)};
         }
+
+        function getPointOnLine(start_point, end_point, distance) {
+            var dx = end_point.x - start_point.x;
+            var dy = end_point.y - start_point.y;
+            var fraction = Math.max(Math.abs(dx), Math.abs(dy)) / distance;
+            if (fraction < 1) {
+                return end_point;
+            } else {
+                var x = start_point.x + dx / fraction;
+                var y = start_point.y + dy / fraction;
+                return {x:Math.round(x), y:Math.round(y)};                   
+            } 
+        }
+
+        function pointsEquals(start_point, end_point) {
+            var result;
+            if (start_point.x == end_point.x && start_point.y == end_point.y) {
+                result = true;
+            } else {
+                result = false;
+            }
+            return result;
+        }
+
+
 	  </script>
 	</body>
 </html>
