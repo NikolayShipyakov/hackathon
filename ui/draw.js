@@ -11,8 +11,25 @@ var stage = new Kinetic.Stage({
     height: stageHeight
 });
 
-var layer = new Kinetic.Layer();
+var oldLayer = new Kinetic.Layer();
+var drawOldItems = function() {
+    for(var i = 0; i < 8; i++) {
+        var item = new Kinetic.Circle({
+            x: stageWidth * Math.random(),
+            y: stageHeight * Math.random(),
+            radius: littleRoundRad,
+            fillRadialGradientStartRadius: littleRoundRad * 0.9,
+            opacity: 0.5,
+            fillRadialGradientEndRadius: littleRoundRad,
+            fillRadialGradientColorStops: [0, 'green', 1, 'white'],
+        });
+        oldLayer.add(item);
+    }
+};
+drawOldItems();
+stage.add(oldLayer);
 
+var layer = new Kinetic.Layer();
 var mainCircle = new Kinetic.Circle({
     x: stage.getWidth() / 2,
     y: stage.getHeight() / 2,
@@ -20,7 +37,7 @@ var mainCircle = new Kinetic.Circle({
     fill: 'red'
 });
 
-function drawFriends(){
+function drawFriends() {
     for (i = 0; i < 5; i++){
         var rot = i * gradDif;
         var multX;
