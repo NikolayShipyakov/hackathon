@@ -1,103 +1,64 @@
 <html>
     <head>
-        <script src="kinetic-v4.7.4.js" type="text/javascript"></script>
+        <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.7.3-beta.js"></script>
     </head>
 	<body>
-	  <canvas id="myCanvas" width="800" height="600" style="position:absolute; left:0; top:0;"></canvas>
+    <div id="container"></div>
 	  <script>
-	    var canvas = document.getElementById('myCanvas');
-	    canvas.width = document.body.clientWidth; 
-    	canvas.height = document.body.clientHeight;
-    
-	    var context = canvas.getContext('2d');
+	    var stageWidth = screen.width;
+        var stageHeight = screen.height;
 
+        var stage = new Kinetic.Stage({
+            container: 'container',
+            width: stageWidth,
+            height: stageHeight
+        });
 
-	  context.beginPath();
-      context.moveTo(canvas.width / 2 - 100, canvas.height / 2 - 100);
-      context.lineTo(canvas.width / 2 + 100, canvas.height / 2 - 100);
-      context.lineTo(canvas.width / 2 + 100, canvas.height / 2 + 100);
-      context.lineTo(canvas.width / 2 - 100, canvas.height / 2 + 100);
-      context.closePath();
-      context.fillStyle = 'yellow';
-      context.fill();
-	  context.lineWidth = 5;
-      context.strokeStyle = 'red';
-      context.stroke();
+        var layer = new Kinetic.Layer();
 
+        var line = new Kinetic.Line({
+            points: [70, 70, 140, 70],
+            stroke: 'red',
+            strokeWidth: 15,
+            lineCap: 'round',
+            lineJoin: 'round'
+        });
 
-	    context.beginPath();
-	    context.moveTo(100, 150);
-	    context.lineTo(450, 50);
-	    context.stroke();
-
-	    context.beginPath();
-	    context.moveTo(200, 250);
-	    context.lineTo(450, 50);
-	    context.lineTo(450, 100);
-	    context.arcTo(300, 100, 70, 570, 500);  
-	    context.lineJoin = 'bevel';	    
-	    context.lineWidth = 10;
-	    context.strokeStyle = 'blue';
-	    context.stroke();	
-
-	    var x = canvas.width / 2 + 100;
-	    var y = canvas.height / 2 + 100;
-	    var radius = 50;
-	    var startAngle = Math.PI;
-      	var endAngle = 3 * Math.PI / 2;
-		var counterClockwise = true;
-
-		context.beginPath();
-		context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-		context.lineWidth = 20;
-		// line color
-		context.strokeStyle = 'red';
-		context.lineCap = 'round';
-		context.stroke();
-
-
-		counterClockwise = false;
-		context.beginPath();
-		context.arc(x, y, radius, startAngle, endAngle, counterClockwise);
-		context.lineWidth = 20;
-		// line color
-		context.strokeStyle = 'red';
-		context.lineCap = 'round';
-		context.stroke();
-
-        context.beginPath();
-        context.moveTo(300, 300);
-        /*
-        var myAnimationName = new Kinetic.Animation(function(frame) {
-            console.log(frame.time);
-            target.setX(target.getX()+1);
-            if(target.getX()<somePosition){
-                target.setX(somePosition);
-                this.stop();
+        layer.add(line);
+        stage.add(layer);
+        var circle = null;
+        var radiusInc = 50;
+        var lineInc = 10;
+        /**
+         * Анимация развертки блогов и сообщений
+         */
+        var circleAnimation = new Kinetic.Animation(function(frame) {
+            var radius = circle.getRadius() + 1;
+            circle.setRadius(radius);
+            var point = {
+                x : line.getPoints()[1].x - radiusInc,
+                y : line.getPoints()[1].y
+            };
+            if (circle.intersects(point)) {
+                circleAnimation.stop();
             }
         }, layer);
-        myAnimationName.start();*/
 
-
-	  var rectWidth = 200;
-      var rectHeight = 100;
-      var rectX = 189;
-      var rectY = 50;
-      var cornerRadius = 50;
-
-      context.beginPath();
-      context.moveTo(rectX, rectY);
-      context.lineTo(rectX + rectWidth - cornerRadius, rectY);
-      context.arcTo(rectX + rectWidth, rectY, rectX + rectWidth, rectY + cornerRadius, cornerRadius);
-      context.lineTo(rectX + rectWidth, rectY + rectHeight);
-      context.lineWidth = 5;
-      context.stroke();
-
-
-
-
-
-	    // do stuff here
+        var lineAnimation = new Kinetic.Animation(function(frame) {
+            line.getPoints()[1].x = line.getPoints()[1].x + lineInc;
+            if (line.getPoints()[1].x===500) {
+                lineAnimation.stop();
+                circle = new Kinetic.Circle({
+                    x: line.getPoints()[1].x,
+                    y: line.getPoints()[1].y,
+                    radius: 10,
+                    fill: 'red'
+                });
+                layer.add(circle);
+                circleAnimation.start();
+            }
+        }, layer);
+        lineAnimation.start();
 	  </script>
 	</body>
 </html>
