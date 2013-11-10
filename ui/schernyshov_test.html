@@ -1,64 +1,100 @@
 <html>
     <head>
         <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.7.3-beta.js"></script>
+        <script src="trigonometrics.js"></script>
     </head>
 	<body>
     <div id="container"></div>
 	  <script>
+        var friends = [{"name":"Ivan"}, {"name":"Vlad"}, {"name":"Anton"}, {"name":"Сергей"}, {"name":"Вован"}, {"name":"Петька"}];
 	    var stageWidth = screen.width;
         var stageHeight = screen.height;
-
         var stage = new Kinetic.Stage({
             container: 'container',
             width: stageWidth,
             height: stageHeight
         });
-
         var layer = new Kinetic.Layer();
-
-        var line = new Kinetic.Line({
-            points: [70, 70, 140, 70],
-            stroke: 'red',
-            strokeWidth: 15,
-            lineCap: 'round',
-            lineJoin: 'round'
-        });
-
-        layer.add(line);
         stage.add(layer);
-        var circle = null;
+
+        
         var radiusInc = 50;
         var lineInc = 10;
-        /**
-         * Анимация развертки блогов и сообщений
-         */
-        var circleAnimation = new Kinetic.Animation(function(frame) {
-            var radius = circle.getRadius() + 1;
-            circle.setRadius(radius);
-            var point = {
-                x : line.getPoints()[1].x - radiusInc,
-                y : line.getPoints()[1].y
-            };
-            if (circle.intersects(point)) {
-                circleAnimation.stop();
-            }
-        }, layer);
 
-        var lineAnimation = new Kinetic.Animation(function(frame) {
-            line.getPoints()[1].x = line.getPoints()[1].x + lineInc;
-            if (line.getPoints()[1].x===500) {
-                lineAnimation.stop();
-                circle = new Kinetic.Circle({
-                    x: line.getPoints()[1].x,
-                    y: line.getPoints()[1].y,
-                    radius: 10,
-                    fill: 'red'
-                });
-                layer.add(circle);
-                circleAnimation.start();
+
+
+
+        var myfriend = new Friend(null, choosePosition(), choosePosition(), layer);
+        //myfriend.appear();
+
+        function Friend(friend, start_point, end_point, layer) {
+            // Круг
+            var circle = null;
+            // Начало линии
+            var line = new Kinetic.Line({
+                points: [start_point.x, start_point.y, end_point.x, end_point.y],
+                stroke: 'red',
+                strokeWidth: 15,
+                lineCap: 'round',
+                lineJoin: 'round'
+            });
+            var newEnd = evalLineEndCoord(start_point,end_point);
+            var line2 = new Kinetic.Line({
+                points: [start_point.x, start_point.y, newEnd.x, newEnd.y],
+                stroke: 'blue',
+                strokeWidth: 15,
+                lineCap: 'round',
+                lineJoin: 'round'
+            });
+
+            layer.add(line);
+            layer.add(line2);
+            // Анимация 
+            this.appear = function() {
+                // Анимация развертки блогов и сообщений           
+                var circleAnimation = new Kinetic.Animation(function(frame) {
+                    var radius = circle.getRadius() + 1;
+                    circle.setRadius(radius);
+                    var point = {
+                        x : line.getPoints()[1].x - radiusInc,
+                        y : line.getPoints()[1].y
+                    };
+                    if (circle.intersects(point)) {
+                        circleAnimation.stop();
+                    }
+                }, layer);
+
+                var lineAnimation = new Kinetic.Animation(function(frame) {
+                    line.getPoints()[1].x = line.getPoints()[1].x + lineInc;
+                    if (line.getPoints()[1].x===120) {
+                        lineAnimation.stop();
+                        circle = new Kinetic.Circle({
+                            x: line.getPoints()[1].x,
+                            y: line.getPoints()[1].y,
+                            radius: 10,
+                            fill: 'red'
+                        });
+                        layer.add(circle);
+                        circleAnimation.start();
+                    }
+                }, layer);
+
+                lineAnimation.start();
             }
-        }, layer);
-        lineAnimation.start();
+        }
+
+        function evalLineEndCoord(start_point, end_point) {
+            var x = 10;
+            var tg = (end_point.y - start_point.y) / (end_point.x - start_point.x);
+            var y = tg * x;
+            return {x : x, y : y};
+        }
+
+
+        function choosePosition() {
+            var seed = 1000;
+            return {x:Math.round(Math.random()*seed), y:Math.round(Math.random()*seed)};
+        }
 	  </script>
 	</body>
 </html>
