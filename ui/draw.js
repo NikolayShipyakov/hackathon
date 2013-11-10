@@ -132,4 +132,4 @@ drawFriends();
 //layer.add(rect);
 
 // add the layer to the stage
-//stage.add(layer);
+stage.add(layer);
