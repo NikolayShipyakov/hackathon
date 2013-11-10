@@ -1,4 +1,7 @@
 <html>
+    <head>
+        <script src="kinetic-v4.7.4.js" type="text/javascript"></script>
+    </head>
 	<body>
 	  <canvas id="myCanvas" width="800" height="600" style="position:absolute; left:0; top:0;"></canvas>
 	  <script>
@@ -61,6 +64,19 @@
 		context.strokeStyle = 'red';
 		context.lineCap = 'round';
 		context.stroke();
+
+        context.beginPath();
+        context.moveTo(300, 300);
+        /*
+        var myAnimationName = new Kinetic.Animation(function(frame) {
+            console.log(frame.time);
+            target.setX(target.getX()+1);
+            if(target.getX()<somePosition){
+                target.setX(somePosition);
+                this.stop();
+            }
+        }, layer);
+        myAnimationName.start();*/
 
 
 	  var rectWidth = 200;
