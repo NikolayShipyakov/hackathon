@@ -24,7 +24,7 @@ var getCircleCoordinatesLight = function(circles, radius) {
         height = stageHeight - radius * 2;
     tries = 1000;
     do {
-        if(!tries) return null;
+        if(!tries--) return null;
         coords = {x: weight* Math.random() + radius, y: height * Math.random() + radius};
     } while(isCircleIntercept(circles, coords, radius));
     return coords;
