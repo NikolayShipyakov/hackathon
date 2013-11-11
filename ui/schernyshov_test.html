@@ -19,7 +19,7 @@
 
         
         // Надо вынести в константы, чтоль
-        var radiusInc = 50;
+        var radius = 50;
 
 
         // Рисуем линию с кругом по случайным координатам!
@@ -32,64 +32,72 @@
             // Круг
             var circle = null;
             var short_line_length = 10;
-
+            this.getCircle = function() {
+                return circle;
+            }
             // Начало линии
             var short_point = getPointOnLine(start_point, end_point, short_line_length);
-            var line = new Kinetic.Line({
+            var lineFromSource = new Kinetic.Line({
                 points: [start_point.x, start_point.y, short_point.x, short_point.y],
                 stroke: 'red',
                 strokeWidth: 15,
                 lineCap: 'round',
                 lineJoin: 'round'
             });
-            layer.add(line);
+            var lineToSource = new Kinetic.Line({
+                points: [end_point.x, end_point.y, short_point.x, short_point.y],
+                stroke: 'red',
+                strokeWidth: 15,
+                lineCap: 'round',
+                lineJoin: 'round'
+            });
+            layer.add(lineFromSource);
+            layer.add(lineToSource);
 
             // Анимация 
             this.appear = function() {
                 var line_inc = 10;
-                var currentLength = short_line_length;
-                // Анимация развертки блогов и сообщений           
-                var circleAnimation = new Kinetic.Animation(function(frame) {
-                    var radius = circle.getRadius() + 1;
-                    circle.setRadius(radius);
-                    var point = {
-                        x : line.getPoints()[1].x - radiusInc,
-                        y : line.getPoints()[1].y
-                    };
-                    if (circle.intersects(point)) {
-                        circleAnimation.stop();
+                var currentLengthIn = short_line_length;
+                var currentLengthOut = short_line_length;
+                // Анимация развертки блогов и сообщений
+                var lineAnimation = new Kinetic.Animation(function (frame) {
+                    currentLengthIn += line_inc;
+                    var next_point = getPointOnLine(start_point, end_point, currentLengthIn)
+                    lineFromSource.getPoints()[1].x = next_point.x;
+                    lineFromSource.getPoints()[1].y = next_point.y;
+                    if (pointsEquals(lineFromSource.getPoints()[1], lineToSource.getPoints()[1])) {
+                        lineAnimation.stop();
                     }
                 }, layer);
-
-                var lineAnimation = new Kinetic.Animation(function(frame) {
-                    currentLength += line_inc;
-                    var next_point = getPointOnLine(start_point, end_point, currentLength)
-                    line.getPoints()[1].x = next_point.x;
-                    line.getPoints()[1].y = next_point.y;
-                    if (pointsEquals(next_point, end_point)) {
-                        lineAnimation.stop();
+                var circleAnimation = new Kinetic.Animation(function (frame) {
+                    currentLengthOut += line_inc;
+                    if (circle == null) {
                         circle = new Kinetic.Circle({
-                            x: line.getPoints()[1].x,
-                            y: line.getPoints()[1].y,
+                            x: lineToSource.getPoints()[1].x,
+                            y: lineToSource.getPoints()[1].y,
                             radius: 10,
                             fill: 'red'
                         });
                         layer.add(circle);
-                        circleAnimation.start();
+                        setTimeout(function () {
+                            new Kinetic.Tween({
+                                node: myfriend.getCircle(),
+                                duration: 0.5,
+                                radius: radius
+                            }).play();
+                        });
+                    }
+                    var next_point = getPointOnLine(end_point, start_point, currentLengthOut)
+                    lineToSource.getPoints()[1].x = next_point.x;
+                    lineToSource.getPoints()[1].y = next_point.y;
+                    if (pointsEquals(lineFromSource.getPoints()[1], lineToSource.getPoints()[1])) {
+                        circleAnimation.stop();
                     }
                 }, layer);
-
+                circleAnimation.start();
                 lineAnimation.start();
             }
         }
-
-        function evalLineEndCoord(start_point, end_point) {
-            var x = 10;
-            var tg = (end_point.y - start_point.y) / (end_point.x - start_point.x);
-            var y = tg * x;
-            return {x : x, y : y};
-        }
-
 
         function choosePosition() {
             var seed = 1000;
