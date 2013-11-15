@@ -51,11 +51,6 @@ var mainCircle = new Kinetic.Circle({
 
 
 
-mainCircle.on('click', function(e) {
-    //myfriend.appear();
-    drawFriends();
-});
-
 
 function drawFriends() {
     //var rects = randomRectPosition(5);
@@ -92,26 +87,6 @@ function drawFriends() {
     layer.draw();*/
 };
 
-function randomRectPosition(count) {
-   count = count || 5;
-   var rects = new Array();
-   var min = 1;
-   var max = 100;
-   var y = Math.floor((Math.random() * max) + min);
-   for (var i = 0; i < count; i++) {
-       rects.push(new utils.Rect(100, 100, Math.floor((Math.random() * max) + min), y));
-       if (i == Math.round(count / 2)) {
-           y += max;
-           min = 1;
-           max = 100;
-       } else {
-           min = max + (max * 2);
-           max += max + min;
-       }
-   }
-    return rects;
-}
-
 // Конструктор объекта типа "друг" (вообще-то он должен быть универсальным)
 function Friend(friend, start_point, end_point, layer) {
     // Круг
@@ -141,9 +116,22 @@ function Friend(friend, start_point, end_point, layer) {
         lineCap: 'round',
         lineJoin: 'round'
     });
+    var circle = new Kinetic.Circle({
+        x: lineToSource.getPoints()[1].x,
+        y: lineToSource.getPoints()[1].y,
+        radius: 5,
+        fill: 'red'
+    });
+    layer.add(circle);
+    var tweenAnimation = new Kinetic.Tween({
+        node: circle,
+        duration: 0.5,
+        radius: radius
+    });
 
     // Анимация
     this.appear = function() {
+        var executeFirst = true;
         layer.add(lineFromSource);
         layer.add(lineToSource);
         var line_inc = 10;
@@ -166,21 +154,11 @@ function Friend(friend, start_point, end_point, layer) {
         }, layer);
         circleAnimation = new Kinetic.Animation(function (frame) {
             currentLengthOut += line_inc;
-            if (circle == null) {
-                circle = new Kinetic.Circle({
-                    x: lineToSource.getPoints()[1].x,
-                    y: lineToSource.getPoints()[1].y,
-                    radius: 10,
-                    fill: 'red'
-                });
-                layer.add(circle);
+            if (executeFirst) {
                 setTimeout(function () {
-                    new Kinetic.Tween({
-                        node: circle,
-                        duration: 0.5,
-                        radius: radius
-                    }).play();
+                   tweenAnimation.play();
                 });
+                executeFirst = false;
             }
             var next_point = getPointOnLine(end_point, start_point, currentLengthOut)
             lineToSource.getPoints()[1].x = next_point.x;
@@ -199,10 +177,6 @@ function Friend(friend, start_point, end_point, layer) {
     }
 }
 
-function choosePosition() {
-    var seed = 1000;
-    return {x:Math.round(Math.random()*seed), y:Math.round(Math.random()*seed)};
-}
 
 function getPointOnLine(start_point, end_point, distance) {
     var dx = end_point.x - start_point.x;
@@ -232,8 +206,200 @@ function getCoordinatesFromShape(shape) {
 }
 
 
-// add the shape to the layer
+var mainMenu = (function(){
+    var button={};
+    var buttons = new Array();
+
+    button.draw = function(x, y){
+         return
+    }
+
+    return button;
+})
+
+/*
+var arc = new Kinetic.Shape({
+        drawFunc: function(layer) {
+            var x = 100;
+            var y = 100;
+            var radius = 70;
+            var startAngle = 3 * (Math.PI / 2);
+            var endAngle = 0 * Math.PI;
+            layer.beginPath();
+            layer.bezierCurveTo(140, 10, 388, 10, 388, 170);
+            layer.lineWidth = 10;
+            */
+/*layer.arc(x, y, radius, startAngle, endAngle, false);
+            layer.fillStrokeShape(this);*//*
+
+        },
+    stroke: 'black',
+    strokeWidth: 4,
+    draggable:true
+});
+*/
+var triangle = new Kinetic.Shape({
+    drawFunc: function(context) {
+        context.beginPath();
+        if (this.getAttr('animate')) {
+            var inc = this.getAttr('inc');
+            this.getAttr('center').x += inc;
+            this.getAttr('center').y -= inc;
+        }
+        var x = this.getAttr('center').x;
+        var y = this.getAttr('center').y;
+        var radius = this.getAttr('radius');
+        var animate = this.getAttr('animate');
+        var startAngle = 3 * (Math.PI / 2);
+        var endAngle = 0 * Math.PI;
+        context.moveTo(x, y - (radius / 2));
+        context.arc(x, y, radius, startAngle, endAngle, false);
+        context.lineTo(x + (radius / 2), y);
+        context.closePath();
+
+        // KineticJS specific context method
+        context.fillStrokeShape(this);
+    },
+    fill: '#00D2FF',
+    stroke: 'black',
+    strokeWidth: 4,
+    center: getCoordinatesFromShape(mainCircle),
+    animate: false,
+    radius: 100,
+    inc: 0.07
+});
+
+var triangle1 = new Kinetic.Shape({
+    drawFunc: function(context) {
+        context.beginPath();
+        if (this.getAttr('animate')) {
+            var inc = this.getAttr('inc');
+            this.getAttr('center').x += inc;
+            this.getAttr('center').y += inc;
+        }
+        var x = this.getAttr('center').x;
+        var y = this.getAttr('center').y;
+        var radius = this.getAttr('radius');
+        var startAngle = 0;
+        var endAngle = Math.PI / 2;
+        context.moveTo(x + (radius / 2), y);
+        context.arc(x, y, radius, startAngle, endAngle, false);
+        context.lineTo(x, y + (radius / 2));
+        context.closePath();
+
+        // KineticJS specific context method
+        context.fillStrokeShape(this);
+    },
+    fill: '#00D2FF',
+    stroke: 'black',
+    strokeWidth: 4,
+    center: getCoordinatesFromShape(mainCircle),
+    animate: false,
+    radius: 100,
+    inc: 0.07
+});
+var triangle2 = new Kinetic.Shape({
+    drawFunc: function(context) {
+        context.beginPath();
+        if (this.getAttr('animate')) {
+            var inc = this.getAttr('inc');
+            this.getAttr('center').x -= inc;
+            this.getAttr('center').y += inc;
+        }
+        var x = this.getAttr('center').x;
+        var y = this.getAttr('center').y;
+        var radius = this.getAttr('radius');
+        var startAngle = Math.PI / 2;
+        var endAngle = Math.PI;
+        context.moveTo(x, y + (radius / 2));
+        context.arc(x, y, radius, startAngle, endAngle, false);
+        context.lineTo(x - (radius / 2), y);
+        context.closePath();
+
+        // KineticJS specific context method
+        context.fillStrokeShape(this);
+    },
+    fill: '#00D2FF',
+    stroke: 'black',
+    strokeWidth: 4,
+    center: getCoordinatesFromShape(mainCircle),
+    animate: false,
+    radius: 100,
+    inc: 0.07
+});
+var triangle3 = new Kinetic.Shape({
+    drawFunc: function(context) {
+        context.beginPath();
+        if (this.getAttr('animate')) {
+            var inc = this.getAttr('inc');
+            this.getAttr('center').x -= inc;
+            this.getAttr('center').y -= inc;
+        }
+        var x = this.getAttr('center').x;
+        var y = this.getAttr('center').y;
+        var radius = this.getAttr('radius');
+        var startAngle = Math.PI;
+        var endAngle = 3 * (Math.PI / 2);
+        context.moveTo(x - (radius / 2), y);
+        context.arc(x, y, radius, startAngle, endAngle, false);
+        context.lineTo(x, y - (radius / 2));
+        context.closePath();
+
+        // KineticJS specific context method
+        context.fillStrokeShape(this);
+    },
+    fill: '#00D2FF',
+    stroke: 'black',
+    strokeWidth: 4,
+    center: getCoordinatesFromShape(mainCircle),
+    animate: false,
+    radius: 100,
+    inc: 0.07
+});
+
+
+mainCircle.on('click', function(e) {
+    var anim = new Kinetic.Animation(function(frame) {
+        var center = getCoordinatesFromShape(mainCircle);
+    //    var angleDiff = frame.timeDiff * angularSpeed / 1000;
+        var stop = false;
+        var buttons = group.getChildren();
+        for(var i = 0; i < buttons.length; i++){
+            stop = false;
+            buttons[i].getAttrs['animate'] = true;
+            buttons[i].getAttrs['inc'] = 0.1;
+            var buttonRadius = buttons[i].getAttr('radius');
+            var circleRadius = mainCircle.getRadius();
+            var buttonCenter = buttons[i].getAttr('center');
+
+            if ((Math.abs((buttonCenter.x + buttonRadius)) >= (Math.abs(center.x + circleRadius) - 5)) ||
+                (Math.abs((buttonCenter.x - buttonRadius)) >= (Math.abs(center.x - circleRadius) + 5))) {
+                stop = true;
+            }
+        }
+
+            if (stop) {
+                this.stop();
+            }
+
+   }, layer);
+    anim.start();
+    //drawFriends();
+});
+
+
+var group = new Kinetic.Group({
+});
 layer.add(mainCircle);
+group.add(triangle);
+group.add(triangle1);
+group.add(triangle2);
+group.add(triangle3);
+
+layer.add(group);
+
+// add the shape to the layer
+
 
 //drawFriends();
 
@@ -242,3 +408,23 @@ layer.add(mainCircle);
 
 // add the layer to the stage
 stage.add(layer);
+
+function firstAnimation() {
+    new Kinetic.Tween({
+        node: mainCircle,
+        duration: 0.5,
+        duration: 4,
+        radius: mainCircle.getRadius() + 50
+    }).play();
+    var buttons = group.getChildren();
+    for (var i = 0; i < buttons.length; i++) {
+        new Kinetic.Tween({
+            node: buttons[i],
+            duration: 0.5,
+            duration: 4,
+            animate: true,
+            radius: buttons[i].getAttr('radius') + 5
+        }).play();
+    }
+}
+firstAnimation();
