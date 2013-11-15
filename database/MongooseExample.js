@@ -1,5 +1,6 @@
 var http = require("http");
 var mongoose = require('mongoose');
+var model = require('./model');
 
 var db = mongoose.connection;
 
@@ -10,24 +11,13 @@ db.once('open', function() {
 
 mongoose.connect('mongodb://localhost/test');
 
-var movieSchema = new mongoose.Schema({
-    title: { type: String }
-    , rating: String
-    , releaseYear: Number
-});
-
-var Movie = mongoose.model('Movie', movieSchema);
-
 http.createServer(function(request, response) {
-    var thor = new Movie({
-        title: 'Thor 2'
-        , rating: '8/10'
-        , releaseYear: '2013'  // Notice the use of a String rather than a Number - Mongoose will automatically convert this for us.
-    });
+    var post = new model.posts({id: 1, time: 1, likesCount: 1});
 
-    thor.save(function(err, thor) {
-        if (err) return console.error(err);
-        console.dir(thor);
+    var friends = new model.friends({id: 1, friends: [2,3,4,5,6,7]});
+
+    friends.save(function(err, result){
+        console.log(result);
     });
     response.writeHead(200, {"Content-Type": "text/plain"});
     response.write("Hello World");
