@@ -60,10 +60,9 @@ mainCircle.on('click', function(e) {
 function drawFriends() {
     //var rects = randomRectPosition(5);
     for (var i = 0; i < 5; i++){
-        friends.push(new Friend(null, utils.getCircleCoordinates(viewportRect, layer, 50), getCoordinatesFromShape(mainCircle), layer));
-    }
-    for (var i = 0; i < friends.length; i++){
-        friends[i].appear();
+		var friend = new Friend(null, utils.getCircleCoordinates(viewportRect, layer, 50), getCoordinatesFromShape(mainCircle), layer);
+        friends.push(friend);
+		friend.appear();
     }
 
 /*    for (i = 0; i < 5; i++){
